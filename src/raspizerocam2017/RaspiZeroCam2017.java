@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class RaspiZeroCam2017 {
 
-    public static final String VERSION = "RaspiZeroCam VERSION 0.1c";
+    public static final String VERSION = "RaspiZeroCam VERSION 0.1d";
 
     // This is the controller.
     private GpioController gpio;
