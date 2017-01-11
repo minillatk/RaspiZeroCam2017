@@ -22,8 +22,9 @@ import java.util.logging.Logger;
  */
 public class RaspiZeroCam2017 {
 
-    public static final String VERSION = "RaspiZeroCam VERSION 0.1d";
-
+    public static final String VERSION = "RaspiZeroCam VERSION 0.1e";
+    public static final String Splash = "fbi -nocomments -noverbose -a -T 10 -d /dev/fb1 /home/pi/Pictures/raspizerocam.png &";//スプラッシュ画像のディレクトリ
+    
     // This is the controller.
     private GpioController gpio;
 
@@ -55,6 +56,7 @@ public class RaspiZeroCam2017 {
 
     //RaspiZeroCam2017コンストラクタ
     public RaspiZeroCam2017() {
+        Commands.executeCommand(Splash);
 
         this.gpio = GpioFactory.getInstance();
         this.red = gpio.provisionDigitalOutputPin(redPin);
