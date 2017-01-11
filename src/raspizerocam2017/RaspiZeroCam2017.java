@@ -10,12 +10,12 @@ package raspizerocam2017;
  * @author maruhachi
  */
 public class RaspiZeroCam2017 {
-
+    public static final String VERSION = "RaspiZeroCam VERSION 0.1";
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        System.out.println(VERSION);
     }
     
 }
