@@ -44,7 +44,6 @@ class Stillimg implements GpioPinListenerDigital {
 		} else {
 		System.out.println("こっちオン！");
 		still();
-		//test("ぬっぴょろん"); //
 		}
 		this.raspizerocam2017.togglestillCapture();
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -54,17 +53,8 @@ class Stillimg implements GpioPinListenerDigital {
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMdd-HHmm-ss");
 		String filename = this.startInstruction + dateFormat.format(date) + ".jpeg";
-		executeCommand(filename);
+		Commands.executeCommand(filename);
 		System.out.println("stillメソッドだよ？");
-	}
-        private void executeCommand(String cmd) {
-		Runtime r = Runtime.getRuntime();
-		try {
-			r.exec(cmd);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
     
 }

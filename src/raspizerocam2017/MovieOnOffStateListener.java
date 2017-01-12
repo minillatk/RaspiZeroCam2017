@@ -55,7 +55,7 @@ public void handleGpioPinDigitalStateChangeEvent(
     }
 
     private void killCapture() {
-        executeCommand(this.killInstruction);
+        Commands.executeCommand(this.killInstruction);
     }
 
     private void startCapture() {
@@ -63,16 +63,7 @@ public void handleGpioPinDigitalStateChangeEvent(
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MMdd_HHmm_ss");
         String filename = this.startInstruction + "vid-" + dateFormat.format(
                 date) + ".h264";
-        executeCommand(filename);
+        Commands.executeCommand(filename);
     }
 
-    private void executeCommand(String cmd) {
-        Runtime r = Runtime.getRuntime();
-        try {
-            r.exec(cmd);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }   
 }
