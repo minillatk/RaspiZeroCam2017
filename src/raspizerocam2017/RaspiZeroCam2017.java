@@ -22,11 +22,11 @@ import java.util.logging.Logger;
  */
 public class RaspiZeroCam2017 {
 
-    public static final String VERSION = "RaspiZeroCam VERSION 0.1e";
+    public static final String VERSION = "RaspiZeroCam VERSION 0.1f";
     public static final String Splash = "fbi -nocomments -noverbose -a -T 10 -d /dev/fb1 /home/pi/Pictures/raspizerocam.png &";//スプラッシュ画像のディレクトリ
-    
+
     // This is the controller.
-    private GpioController gpio;
+    public static GpioController gpio;
 
     // The current pin mapping
     private static final Pin greenPin = RaspiPin.GPIO_28;
@@ -48,11 +48,11 @@ public class RaspiZeroCam2017 {
     private final GpioPinDigitalInput rstBTN;
     private final GpioPinDigitalInput movieOnOffSW;
 
-    // キャプチャするときにtrueに設定 set to true when capturing
-    private boolean capturing;
-
-    //スチール用の変数
-    private boolean shutterPressed;
+    private boolean movieCapturringPressed;// ムービー撮影するときにtrueに設定 set to true when capturing_toggle
+    private boolean shutterPressed;//スチール用のブーリアン変数トグル処理に使う
+    private boolean resetPressed;//リセット用のブーリアン変数トグル処理に使う
+    private boolean vidOnOffCheck;//プレビューRaspividのトグルに使う
+    private boolean shutdownPressed;//シャットダウン用のブーリアン変数トグル処理に使う
 
     //RaspiZeroCam2017コンストラクタ
     public RaspiZeroCam2017() {
@@ -71,34 +71,80 @@ public class RaspiZeroCam2017 {
                 PinPullResistance.PULL_UP);
         this.movieOnOffSW = gpio.provisionDigitalInputPin(moviePin,
                 PinPullResistance.PULL_UP);
-        
-                //リスナーはカメラと赤色LEDのON/OFFを操作する
-        //The listener takes care of turning on and off the camera and the red LED
+
+        Commands.startfbcp();
+        Commands.startDemoVid();
+
+        //各々のボタン類をリスナーで監視する。ここでボタンと命令がひもつけされる。
+        //リスナーはカメラと赤色LEDのON/OFFを操作する
+        //トグルスイッチの状態を監視し、MovieOnOffStateListenerを作動させる。
         movieOnOffSW.addListener(new MovieOnOffStateListener(this));
-        
-        //スチールカメラ用ボタンleverBTN_Tの状態読み取り
+        //スチールカメラ用ボタンleverBTN_Tの状態読み取り。Stillimg作動。
         leverBTN_T.addListener(new Stillimg(this));
+        //leverBTN_Aの状態読み取り。Reset作動。
+        leverBTN_A.addListener(new Reset(this));
+        //リセットボタンの状態読み取り。Shutdown作動。
+        rstBTN.addListener(new Shutdown(this));
+
     }
-     //スチールカメラ用メソッド
+
+    /**
+     * スチール撮影用トリガー変数のトグル状態を返す
+     *
+     * @return shutterPressed
+     */
     public boolean stillCapturing() {
-        System.out.println("shutterPressed:" + this.shutterPressed);
         return this.shutterPressed; //shutterPressedの値を渡す
     }
 
-    public void togglestillCapture() {
+    /**
+     * スチール撮影用トリガー変数のトグル処理
+     */
+    public void toggleStillCapture() {
         this.shutterPressed = !this.shutterPressed;//反転
-        System.out.println("togglestillCapture:" + this.shutterPressed);
-    }
-    
-    //
-    public boolean isCapturing() {
-        return this.capturing;
     }
 
-    public void toggleCapture() {
-        this.capturing = !this.capturing; //capturingの値を反転させる
+    //ムービー撮影のトグル状態を返す
+    public boolean isMovieCapturing() {
+        return this.movieCapturringPressed;
     }
-    
+
+    //静止画キャプチャーのトグル処理
+    public void toggleMovieCapture() {
+        this.movieCapturringPressed = !this.movieCapturringPressed; //capturingの値を反転させる
+    }
+
+    //リセット処理のためのトグル状態を返す
+    public boolean isReset() {
+        return this.resetPressed;
+    }
+
+    //リセット処理のトグル（反転）
+    public void toggleReset() {
+        this.resetPressed = !this.resetPressed;//resetPressedの値を反転させる
+    }
+
+    public boolean isVidOnOffCheck() {
+        return this.vidOnOffCheck;
+    }
+
+    public void vidOnOffCheck_On() {
+        this.vidOnOffCheck = true;
+    }
+
+    public void vidOnOffCheck_Off() {
+        this.vidOnOffCheck = false;
+    }
+
+    //シャットダウン処理のためのトリガー
+    public boolean isShutdown() {
+        return this.shutdownPressed;
+    }
+
+    public void toggleShutdown() {
+        this.shutdownPressed = !this.shutdownPressed;//shutdownPressedの値を反転させる
+    }
+
     public GpioPinDigitalOutput getRed() {
         return this.red;
     }
@@ -106,12 +152,15 @@ public class RaspiZeroCam2017 {
     public GpioPinDigitalOutput getGreen() {
         return this.green;
     }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         System.out.println(VERSION);
         RaspiZeroCam2017 zerocam = new RaspiZeroCam2017(); //RaspiZeroCam2017をインスタンス化
+        zerocam.getRed().low();
+        zerocam.getGreen().low();
         zerocam.getGreen().high();
         System.out.println("System start");
         while (true) {

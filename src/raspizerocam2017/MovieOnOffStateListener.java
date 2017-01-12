@@ -10,6 +10,8 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -29,36 +31,52 @@ class MovieOnOffStateListener implements GpioPinListenerDigital {
     // Remember to add filename and extension!
     private final String startInstruction = "/usr/bin/raspivid -ISO 100 -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
 
-    private final String killInstruction = "killall raspivid";
-
+    //private final String killInstruction = "killall raspivid";
     //コンストラクタ
     public MovieOnOffStateListener(RaspiZeroCam2017 aThis) {
         this.raspizerocam2017 = aThis; //Mainにあるメンバを使用するためRaspiCamTest型raspicamtestに入れる。
         System.out.println("MovieOnOffStateListenerコンストラクタ実行");
     }
-    
+
     @Override
-public void handleGpioPinDigitalStateChangeEvent(
+    public void handleGpioPinDigitalStateChangeEvent(
             GpioPinDigitalStateChangeEvent event) {
         // display pin state on console
-        if (this.raspizerocam2017.isCapturing()) {
+        if (this.raspizerocam2017.isMovieCapturing()) {
             System.out.println("Killing raspivid");
             this.raspizerocam2017.getRed().low();
             killCapture();
+            Commands.startDemoVid();
         } else {
             System.out.println("Starting raspivid");
             this.raspizerocam2017.getRed().high();
             startCapture();
         }
-        this.raspizerocam2017.toggleCapture();
+        this.raspizerocam2017.toggleMovieCapture();
 
     }
 
     private void killCapture() {
-        Commands.executeCommand(this.killInstruction);
+        Commands.killvid();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Stillimg.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
+        Commands.startDemoVid();
+        System.out.println("DemoVid起動");
     }
 
     private void startCapture() {
+        Commands.killvid();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MovieOnOffStateListener.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MMdd_HHmm_ss");
         String filename = this.startInstruction + "vid-" + dateFormat.format(

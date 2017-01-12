@@ -20,8 +20,31 @@ public class Commands {
         } catch (IOException e) {
         }
     }
+    public static void killfbi(){
+        executeCommand("killall fbi");
+    }
+    
     public static void startfbcp(){
+        executeCommand("fbcp &");
+    }
+    public static void killfbcp(){
         executeCommand("killall fbcp");
     }
 
+    public static void killvid(){
+        executeCommand("killall raspivid");
+    }
+    
+    public static void startDemoVid(){
+        executeCommand("/usr/bin/raspivid -w 180 -h 128 -t 0 -e -rot 270");
+        
+    }
+    
+    public static void killjava(){
+        executeCommand("killall java");
+    }
+    
+    public static void shutdown(){
+        executeCommand("shutdown -h now");
+    }
 }
