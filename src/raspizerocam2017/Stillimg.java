@@ -41,6 +41,7 @@ class Stillimg implements GpioPinListenerDigital {
 		System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
 		if (this.raspizerocam2017.stillCapturing()) {
 		System.out.println("こっちがオフ");
+                off();
 		} else {
 		System.out.println("こっちオン！");
 		still();
@@ -50,11 +51,17 @@ class Stillimg implements GpioPinListenerDigital {
     }
     
     	private void still() {
+            Commands.killvid();
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMdd-HHmm-ss");
 		String filename = this.startInstruction + dateFormat.format(date) + ".jpeg";
 		Commands.executeCommand(filename);
 		System.out.println("stillメソッドだよ？");
 	}
+        
+        private void off(){
+            Commands.startDemoVid();
+            System.out.println("DemoVid起動");
+        }
     
 }

@@ -24,7 +24,7 @@ public class RaspiZeroCam2017 {
 
     public static final String VERSION = "RaspiZeroCam VERSION 0.1e";
     public static final String Splash = "fbi -nocomments -noverbose -a -T 10 -d /dev/fb1 /home/pi/Pictures/raspizerocam.png &";//スプラッシュ画像のディレクトリ
-    
+
     // This is the controller.
     private GpioController gpio;
 
@@ -48,12 +48,15 @@ public class RaspiZeroCam2017 {
     private final GpioPinDigitalInput rstBTN;
     private final GpioPinDigitalInput movieOnOffSW;
 
-    // キャプチャするときにtrueに設定 set to true when capturing
-    private boolean capturing;
+    // キャプチャするときにtrueに設定 set to true when capturing_toggle
+    private boolean capturengPressed;
 
-    //スチール用の変数
+    //スチール用のブーリアン変数
     private boolean shutterPressed;
-
+    
+    //リセット用のブーリアン変数
+    private boolean resetPressed;
+    
     //RaspiZeroCam2017コンストラクタ
     public RaspiZeroCam2017() {
         Commands.executeCommand(Splash);
@@ -72,14 +75,22 @@ public class RaspiZeroCam2017 {
         this.movieOnOffSW = gpio.provisionDigitalInputPin(moviePin,
                 PinPullResistance.PULL_UP);
         
-                //リスナーはカメラと赤色LEDのON/OFFを操作する
+        Commands.startfbcp();
+        Commands.startDemoVid();
+
+        //リスナーはカメラと赤色LEDのON/OFFを操作する
         //The listener takes care of turning on and off the camera and the red LED
         movieOnOffSW.addListener(new MovieOnOffStateListener(this));
-        
+
         //スチールカメラ用ボタンleverBTN_Tの状態読み取り
         leverBTN_T.addListener(new Stillimg(this));
+        
+        //リセットボタンの読み取り
+        rstBTN.addListener(new Reset(this));
     }
-     //スチールカメラ用メソッド
+
+    //スチールカメラ用メソッド
+
     public boolean stillCapturing() {
         System.out.println("shutterPressed:" + this.shutterPressed);
         return this.shutterPressed; //shutterPressedの値を渡す
@@ -89,16 +100,23 @@ public class RaspiZeroCam2017 {
         this.shutterPressed = !this.shutterPressed;//反転
         System.out.println("togglestillCapture:" + this.shutterPressed);
     }
-    
-    //
+
+    //静止画キャプチャーのトグル処理
     public boolean isCapturing() {
-        return this.capturing;
+        return this.capturengPressed;
     }
 
     public void toggleCapture() {
-        this.capturing = !this.capturing; //capturingの値を反転させる
+        this.capturengPressed = !this.capturengPressed; //capturingの値を反転させる
     }
-    
+    //リセットボタンのトグル処理
+    public boolean isReset(){
+        return this.resetPressed;
+    }
+    public void toggleReset(){
+        this.resetPressed = !this.resetPressed;//resetPressedの値を反転させる
+    }
+
     public GpioPinDigitalOutput getRed() {
         return this.red;
     }
@@ -106,12 +124,15 @@ public class RaspiZeroCam2017 {
     public GpioPinDigitalOutput getGreen() {
         return this.green;
     }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         System.out.println(VERSION);
         RaspiZeroCam2017 zerocam = new RaspiZeroCam2017(); //RaspiZeroCam2017をインスタンス化
+        zerocam.getRed().low();
+        zerocam.getGreen().low();
         zerocam.getGreen().high();
         System.out.println("System start");
         while (true) {

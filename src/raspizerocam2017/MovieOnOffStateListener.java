@@ -29,22 +29,22 @@ class MovieOnOffStateListener implements GpioPinListenerDigital {
     // Remember to add filename and extension!
     private final String startInstruction = "/usr/bin/raspivid -ISO 100 -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
 
-    private final String killInstruction = "killall raspivid";
-
+    //private final String killInstruction = "killall raspivid";
     //コンストラクタ
     public MovieOnOffStateListener(RaspiZeroCam2017 aThis) {
         this.raspizerocam2017 = aThis; //Mainにあるメンバを使用するためRaspiCamTest型raspicamtestに入れる。
         System.out.println("MovieOnOffStateListenerコンストラクタ実行");
     }
-    
+
     @Override
-public void handleGpioPinDigitalStateChangeEvent(
+    public void handleGpioPinDigitalStateChangeEvent(
             GpioPinDigitalStateChangeEvent event) {
         // display pin state on console
         if (this.raspizerocam2017.isCapturing()) {
             System.out.println("Killing raspivid");
             this.raspizerocam2017.getRed().low();
             killCapture();
+            Commands.startDemoVid();
         } else {
             System.out.println("Starting raspivid");
             this.raspizerocam2017.getRed().high();
@@ -55,10 +55,11 @@ public void handleGpioPinDigitalStateChangeEvent(
     }
 
     private void killCapture() {
-        Commands.executeCommand(this.killInstruction);
+        Commands.killvid();
     }
 
     private void startCapture() {
+        Commands.killvid();
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MMdd_HHmm_ss");
         String filename = this.startInstruction + "vid-" + dateFormat.format(
