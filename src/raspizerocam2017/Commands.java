@@ -20,5 +20,8 @@ public class Commands {
         } catch (IOException e) {
         }
     }
+    public static void startfbcp(){
+        executeCommand("killall fbcp");
+    }
 
 }
