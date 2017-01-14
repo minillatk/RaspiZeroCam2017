@@ -32,15 +32,11 @@ public class Shutdown implements GpioPinListenerDigital {
         if (sense) {//shutdown用のboolean変数がtrueであれば
             System.out.println("シャットダウンします");
             ledRedBlink();
+            sleep(1000);
             this.raspizerocam2017.gpio.shutdown();
             Commands.killvid();
             Commands.killfbcp();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Shutdown.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
+            sleep(3000);
             Commands.shutdown();
 
         } else {
@@ -54,24 +50,23 @@ public class Shutdown implements GpioPinListenerDigital {
 
     }
 
+    private void sleep(int time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Shutdown.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
+    }
+
     private void ledRedBlink() {
         for (int i = 0; i < 5; i++) {
             this.raspizerocam2017.getRed().high();
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Shutdown.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
+            sleep(300);
 
             this.raspizerocam2017.getRed().low();
 
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Shutdown.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
+            sleep(300);
         }
 
     }

@@ -71,7 +71,7 @@ class Stillimg implements GpioPinListenerDigital {
                     ex);
         }
         
-        Commands.startDemoVid();
+        Commands.startPreviewVid();
         System.out.println("DemoVid起動");
     }
 

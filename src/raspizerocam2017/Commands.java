@@ -25,7 +25,7 @@ public class Commands {
     }
     
     public static void startfbcp(){
-        executeCommand("fbcp &");
+        executeCommand("fbcp");
     }
     public static void killfbcp(){
         executeCommand("killall fbcp");
@@ -35,8 +35,8 @@ public class Commands {
         executeCommand("killall raspivid");
     }
     
-    public static void startDemoVid(){
-        executeCommand("/usr/bin/raspivid -w 180 -h 128 -t 0 -e -rot 270");
+    public static void startPreviewVid(){
+        executeCommand("/usr/bin/raspivid -w 192 -h 128 -t 0 -e -rot 270");
         
     }
     

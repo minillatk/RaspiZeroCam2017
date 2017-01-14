@@ -46,7 +46,7 @@ class MovieOnOffStateListener implements GpioPinListenerDigital {
             System.out.println("Killing raspivid");
             this.raspizerocam2017.getRed().low();
             killCapture();
-            Commands.startDemoVid();
+            Commands.startPreviewVid();
         } else {
             System.out.println("Starting raspivid");
             this.raspizerocam2017.getRed().high();
@@ -64,7 +64,7 @@ class MovieOnOffStateListener implements GpioPinListenerDigital {
             Logger.getLogger(Stillimg.class.getName()).log(Level.SEVERE, null,
                     ex);
         }
-        Commands.startDemoVid();
+        Commands.startPreviewVid();
         System.out.println("DemoVid起動");
     }
 

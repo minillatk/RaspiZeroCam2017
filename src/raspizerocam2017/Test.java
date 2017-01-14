@@ -10,14 +10,14 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
 /**
  *
- * @author minillatk
+ * @author kimuratadashi
  */
-public class Reset implements GpioPinListenerDigital {
+public class Test implements GpioPinListenerDigital {
 
     private final RaspiZeroCam2017 raspizerocam2017; //Mainのメンバを使用するためのインスタンスを用意
 
     //コンストラクタ
-    public Reset(RaspiZeroCam2017 aThis) {
+    public Test(RaspiZeroCam2017 aThis) {
         this.raspizerocam2017 = aThis; //Mainにあるメンバを使用するためRaspiCamTest型raspicamtestに入れる。
         System.out.println("Resetコンストラクタ実行");
     }
@@ -25,34 +25,21 @@ public class Reset implements GpioPinListenerDigital {
     @Override
     public void handleGpioPinDigitalStateChangeEvent(
             GpioPinDigitalStateChangeEvent event) {
-
-        this.raspizerocam2017.toggleReset();//トグル処理
-        switch (this.raspizerocam2017.isReset()) {
+        this.raspizerocam2017.TestCheck();
+        switch (this.raspizerocam2017.isTestCheck()) {
             case 0:
                 break;
             case 1:
                 System.out.println("OFF");
-                vidOff();
                 break;
             case 2:
                 break;
             case 3:
                 System.out.println("ON");
-                vidOn();
                 break;
         }
-    }
-
-    private void vidOn() {
-        Commands.startPreviewVid();
-        this.raspizerocam2017.vidOnOffCheck_On();
-    }
-
-    private void vidOff() {
-        Commands.killvid();
-        Commands.killfbi();
-        Commands.executeCommand(this.raspizerocam2017.Splash);
-        this.raspizerocam2017.vidOnOffCheck_Off();
+        System.out.println("テストクラスのチェンジイベント作動 : " + this.raspizerocam2017.
+                isTestCheck());
     }
 
 }

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class RaspiZeroCam2017 {
 
     public static final String VERSION = "RaspiZeroCam VERSION 0.1f";
-    public static final String Splash = "fbi -nocomments -noverbose -a -T 10 -d /dev/fb1 /home/pi/Pictures/raspizerocam.png &";//スプラッシュ画像のディレクトリ
+    public static final String Splash = "fbi -nocomments -noverbose -a -T 10 -d /dev/fb1 /home/pi/Pictures/raspizerocam.png";//スプラッシュ画像のディレクトリ
 
     // This is the controller.
     public static GpioController gpio;
@@ -50,12 +50,16 @@ public class RaspiZeroCam2017 {
 
     private boolean movieCapturringPressed;// ムービー撮影するときにtrueに設定 set to true when capturing_toggle
     private boolean shutterPressed;//スチール用のブーリアン変数トグル処理に使う
-    private boolean resetPressed;//リセット用のブーリアン変数トグル処理に使う
+    private int resetPressed;//リセット用の変数トグル処理に使う
     private boolean vidOnOffCheck;//プレビューRaspividのトグルに使う
     private boolean shutdownPressed;//シャットダウン用のブーリアン変数トグル処理に使う
+    private int testCheck;//testクラス用
 
     //RaspiZeroCam2017コンストラクタ
     public RaspiZeroCam2017() {
+
+        //this.testCheck = 0;
+
         Commands.executeCommand(Splash);
 
         this.gpio = GpioFactory.getInstance();
@@ -73,18 +77,20 @@ public class RaspiZeroCam2017 {
                 PinPullResistance.PULL_UP);
 
         Commands.startfbcp();
-        Commands.startDemoVid();
+        Commands.startPreviewVid();
 
         //各々のボタン類をリスナーで監視する。ここでボタンと命令がひもつけされる。
         //リスナーはカメラと赤色LEDのON/OFFを操作する
         //トグルスイッチの状態を監視し、MovieOnOffStateListenerを作動させる。
         movieOnOffSW.addListener(new MovieOnOffStateListener(this));
-        //スチールカメラ用ボタンleverBTN_Tの状態読み取り。Stillimg作動。
+        //Stillimgクラス作動。スチールカメラ用ボタンleverBTN_Tの状態読み取り。
         leverBTN_T.addListener(new Stillimg(this));
-        //leverBTN_Aの状態読み取り。Reset作動。
+        //Resetクラス作動。leverBTN_Aの状態読み取り。
         leverBTN_A.addListener(new Reset(this));
-        //リセットボタンの状態読み取り。Shutdown作動。
+        //Shutdownクラス作動。リセットボタンの状態読み取り。
         rstBTN.addListener(new Shutdown(this));
+        //テストクラス作動
+        leverBTN_B.addListener(new Test(this));
 
     }
 
@@ -115,13 +121,14 @@ public class RaspiZeroCam2017 {
     }
 
     //リセット処理のためのトグル状態を返す
-    public boolean isReset() {
+    public int isReset() {
         return this.resetPressed;
     }
 
-    //リセット処理のトグル（反転）
-    public void toggleReset() {
-        this.resetPressed = !this.resetPressed;//resetPressedの値を反転させる
+    //リセット処理のトグル
+    public void toggleReset() {//数値ごとに命令を出すため、カウントさせる
+        this.resetPressed++;
+        this.resetPressed = this.resetPressed <= 3 ? this.resetPressed++ : 0;
     }
 
     public boolean isVidOnOffCheck() {
@@ -142,7 +149,17 @@ public class RaspiZeroCam2017 {
     }
 
     public void toggleShutdown() {
-        this.shutdownPressed = !this.shutdownPressed;//shutdownPressedの値を反転させる
+        this.shutdownPressed = !this.shutdownPressed;//反転
+    }
+
+    //Testクラス用
+    public int isTestCheck() {
+        return this.testCheck;
+    }
+
+    public void TestCheck() {//数値ごとに命令を出すため、カウントさせる
+        this.testCheck++;
+        this.testCheck = this.testCheck <= 3 ? this.testCheck++ : 0;
     }
 
     public GpioPinDigitalOutput getRed() {
