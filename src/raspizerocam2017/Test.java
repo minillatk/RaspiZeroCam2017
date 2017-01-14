@@ -10,7 +10,7 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
 /**
  *
- * @author kimuratadashi
+ * @author minillatk
  */
 public class Test implements GpioPinListenerDigital {
 
