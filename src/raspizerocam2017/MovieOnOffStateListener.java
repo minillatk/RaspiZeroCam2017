@@ -29,9 +29,9 @@ class MovieOnOffStateListener implements GpioPinListenerDigital {
     private final String destDir = "/home/pi/capture/";
 
     // Remember to add filename and extension!
-    private final String startInstruction = "/usr/bin/raspivid -ISO 100 -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
+    //private final String startInstruction = "/usr/bin/raspivid -ISO 100 -vs -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
+    private final String startInstruction = "/usr/bin/raspivid -vs -ex fixedfps -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
 
-    //private final String killInstruction = "killall raspivid";
     //コンストラクタ
     public MovieOnOffStateListener(RaspiZeroCam2017 aThis) {
         this.raspizerocam2017 = aThis; //Mainにあるメンバを使用するためRaspiCamTest型raspicamtestに入れる。
