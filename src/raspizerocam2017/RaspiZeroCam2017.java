@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class RaspiZeroCam2017 {
 
-    public static final String VERSION = "RaspiZeroCam VERSION 0.1g";
+    public static final String VERSION = "RaspiZeroCam VERSION 0.1h";
     public static final String Splash = "fbi -nocomments -noverbose -a -T 10 -d /dev/fb1 /home/pi/Pictures/raspizerocam.png";//スプラッシュ画像のディレクトリ
 
     // This is the controller.
