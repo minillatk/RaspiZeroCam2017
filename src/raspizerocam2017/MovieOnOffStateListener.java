@@ -29,7 +29,8 @@ class MovieOnOffStateListener implements GpioPinListenerDigital {
     private final String destDir = "/home/pi/capture/";
 
     // Remember to add filename and extension!
-    private final String startInstruction = "/usr/bin/raspivid -ISO 100 -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
+    // private final String startInstruction = "/usr/bin/raspivid -ISO 100 -awb auto -t 0 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
+    private final String startInstruction = "/usr/bin/raspivid -awb auto -t 0 -vs -if cyclicrows -fl -b 10000000 " + " -h " + height + " -w " + width + " -rot " + rotation + " -o " + destDir;
 
     //private final String killInstruction = "killall raspivid";
     //コンストラクタ
